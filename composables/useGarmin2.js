@@ -1,20 +1,31 @@
 import { onMounted, onUnmounted } from "vue";
 
+// const options = {
+//   filters: [{ namePrefix: "Garmin" }],
+// };
+
 const options = {
-  filters: [{ namePrefix: "Garmin" }],
+  acceptAllDevices: true,
 };
 
 export const useGarmin2 = () => {
   const isRequesting = ref(false);
   const isConnected = ref(false);
+
   const hasBluetoothAvailability = ref(false);
+  const hasErrorBluetoothAvailability = ref(true);
+  const hasErrorBluetoothAvailabilityMessage = ref("");
 
   const checkBluetoothAvailability = async () => {
     try {
       const availability = await navigator.bluetooth.getAvailability();
       hasBluetoothAvailability.value = availability;
+      hasErrorBluetoothAvailability.value = !availability;
       return availability;
     } catch (err) {
+      hasErrorBluetoothAvailabilityMessage.value = err.message;
+      hasErrorBluetoothAvailability.value = true;
+      // TODO: Remove this alert when you are done debugging:
       alert(err.message);
       console.log("err", err);
     }
