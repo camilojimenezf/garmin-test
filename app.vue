@@ -11,6 +11,14 @@
     <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" @click="getDevices()">
       Get Current Devices
     </button>
+    <template v-if="btDevices && btDevices.length">
+      <h2 class="text-2xl font-bold text-blue-500 mb-5">Bluetooth Devices</h2>
+      <ul>
+        <li v-for="device in btDevices" :key="device.id">
+          Device Name: {{ device.name }}
+        </li>
+      </ul>
+    </template>
   </div>
 </template>
 
@@ -21,6 +29,7 @@ const {
   hasBluetoothAvailability,
   getAvailableDevices,
   getDevices,
+  btDevices
 } = useGarmin2();
 
 </script>

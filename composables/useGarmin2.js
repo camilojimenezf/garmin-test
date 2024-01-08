@@ -11,6 +11,7 @@ const options = {
 export const useGarmin2 = () => {
   const isRequesting = ref(false);
   const isConnected = ref(false);
+  const btDevices = ref([]);
 
   const hasBluetoothAvailability = ref(false);
   const hasErrorBluetoothAvailability = ref(true);
@@ -68,9 +69,12 @@ export const useGarmin2 = () => {
     console.log("getDevices");
 
     isRequesting.value = true;
+    btDevices.value = [];
     try {
       const devices = await navigator.bluetooth.getDevices();
       console.log("devices", devices);
+      btDevices.value = devices;
+      console.log("btDevices", btDevices.value);
       devices.forEach(async (device) => {
         if (device.name.includes("Garmin")) {
           // TODO: validate device Gatt connection and handle unsupported device.
@@ -103,5 +107,6 @@ export const useGarmin2 = () => {
     hasBluetoothAvailability,
     getAvailableDevices,
     getDevices,
+    btDevices,
   };
 };
