@@ -36,7 +36,9 @@ const initMap = () => {
     .setLngLat(placesStore.userLocation)
     .setHTML(`<h4>Aquí estoy</h4><p>Actualmente en Chile</p>`);
 
-  const myLocationMarker = new mapboxgl.Marker()
+  const myLocationMarker = new mapboxgl.Marker({
+    color: "#000000",
+  })
     .setLngLat(placesStore.userLocation)
     .setPopup(myLocationPopup)
     .addTo(map);

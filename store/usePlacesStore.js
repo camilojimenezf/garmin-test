@@ -1,8 +1,11 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
 import { searchApi } from "../../apis"; // Update this path to your API module
+import { useMapStore } from "./useMapStore";
 
 export const usePlacesStore = defineStore("places", () => {
+  const mapStore = useMapStore();
+
   const isLoading = ref(true);
   const userLocation = ref(undefined);
   const isLoadingPlaces = ref(false);
@@ -17,7 +20,6 @@ export const usePlacesStore = defineStore("places", () => {
 
   // Actions
   function setLngLat(coords) {
-    console.log("setLngLat", coords);
     userLocation.value = [coords.lng, coords.lat];
     isLoading.value = false;
   }
@@ -35,6 +37,23 @@ export const usePlacesStore = defineStore("places", () => {
     navigator.geolocation.getCurrentPosition(
       ({ coords }) =>
         setLngLat({ lng: coords.longitude, lat: coords.latitude }),
+      (err) => {
+        console.error(err);
+        throw new Error("No geolocation :(");
+      }
+    );
+  }
+
+  function updateUserLocation() {
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        console.log("coords", coords);
+        setLngLat({ lng: coords.longitude, lat: coords.latitude });
+        mapStore.setUserPlaceMarker({
+          lng: coords.longitude,
+          lat: coords.latitude,
+        });
+      },
       (err) => {
         console.error(err);
         throw new Error("No geolocation :(");
@@ -75,5 +94,6 @@ export const usePlacesStore = defineStore("places", () => {
 
     getInitialLocation,
     searchPlacesByTerm,
+    updateUserLocation,
   };
 });

@@ -1,8 +1,12 @@
 <template>
-  <button v-if="isBtnReady" @click="onMyLocationClicked"
-    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-    Ir a mi ubicación
-  </button>
+  <div class="flex flex-col btn-container" v-if="isBtnReady">
+    <button @click="onMyLocationClicked" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+      Go to my location
+    </button>
+    <button @click="updateMyLocation" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+      Update my location
+    </button>
+  </div>
 </template>
 
 <script setup>
@@ -22,12 +26,20 @@ const onMyLocationClicked = () => {
     zoom: 14,
   })
 };
+
+const updateMyLocation = () => {
+  placesStore.updateUserLocation();
+};
 </script>
 
 <style scoped>
-button {
+.btn-container {
   position: fixed;
-  top: 30px;
+  top: 70px;
   right: 30px;
+}
+
+.btn-container button {
+  margin-bottom: 10px;
 }
 </style>

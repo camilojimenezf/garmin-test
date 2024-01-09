@@ -1,5 +1,6 @@
 import { ref, computed } from "vue";
 import { defineStore } from "pinia";
+import mapboxgl from "mapbox-gl";
 
 export const useMapStore = defineStore("map", () => {
   // State
@@ -103,6 +104,40 @@ export const useMapStore = defineStore("map", () => {
     }
   }
 
+  function setUserPlaceMarker({ lng, lat }) {
+    console.log("setUserPlaceMarker", lng, lat);
+    if (!map.value) return;
+
+    markers.value.forEach((marker) => marker.remove());
+    markers.value = [];
+
+    const popup = new mapboxgl.Popup()
+      .setLngLat([lng, lat])
+      .setHTML(`<h3>User Location</h3><p>Ando por aquí!</p>`);
+
+    const marker = new mapboxgl.Marker({
+      color: "#000000",
+    })
+      .setLngLat([lng, lat])
+      .setPopup(popup)
+      .addTo(map.value);
+
+    markers.value.push(marker);
+
+    if (map.value.getLayer("RouteString")) {
+      map.value.removeLayer("RouteString");
+      map.value.removeSource("RouteString");
+      distance.value = undefined;
+      duration.value = undefined;
+    }
+
+    console.log("flyTo", lng, lat);
+    map.value.flyTo({
+      center: [lng, lat],
+      zoom: 14,
+    });
+  }
+
   return {
     map,
     markers,
@@ -114,5 +149,6 @@ export const useMapStore = defineStore("map", () => {
     getRouteBetweenPoints,
     setMap,
     setPlaceMarkers,
+    setUserPlaceMarker,
   };
 });

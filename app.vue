@@ -1,7 +1,20 @@
 <template>
-  <NuxtLayout>
-    <NuxtPage />
-  </NuxtLayout>
+  <div>
+    <header>
+      <ul class="flex flex-row bg-green-500 py-4">
+        <li class="mr-4">
+          <NuxtLink to="/garminconnection" class="text-white hover:text-green-200 font-semibold">Garmin Connection
+          </NuxtLink>
+        </li>
+        <li>
+          <NuxtLink to="/mappage" class="text-white hover:text-green-200 font-semibold">Map View</NuxtLink>
+        </li>
+      </ul>
+    </header>
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
+  </div>
 </template>
 
 <script setup>
