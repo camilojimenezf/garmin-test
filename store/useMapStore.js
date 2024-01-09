@@ -134,7 +134,7 @@ export const useMapStore = defineStore("map", () => {
     console.log("flyTo", lng, lat);
     map.value.flyTo({
       center: [lng, lat],
-      zoom: 14,
+      zoom: 20,
     });
   }
 
