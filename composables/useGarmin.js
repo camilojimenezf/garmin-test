@@ -8,7 +8,7 @@ const options = {
   acceptAllDevices: true,
 };
 
-export const useGarmin2 = () => {
+export const useGarmin = () => {
   const isRequesting = ref(false);
   const isConnected = ref(false);
   const btDevices = ref([]);
