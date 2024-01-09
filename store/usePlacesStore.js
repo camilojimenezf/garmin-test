@@ -57,7 +57,8 @@ export const usePlacesStore = defineStore("places", () => {
       (err) => {
         console.error(err);
         throw new Error("No geolocation :(");
-      }
+      },
+      { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
     );
   }
 

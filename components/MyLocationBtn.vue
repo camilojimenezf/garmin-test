@@ -35,8 +35,8 @@ const updateMyLocation = () => {
 <style scoped>
 .btn-container {
   position: fixed;
-  top: 70px;
-  right: 30px;
+  bottom: 70px;
+  right: 10px;
 }
 
 .btn-container button {

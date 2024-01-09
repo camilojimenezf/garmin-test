@@ -1,5 +1,6 @@
 <template>
   <MapView />
+  <MyCoordsCard />
   <MyLocationBtn />
 </template>
 
