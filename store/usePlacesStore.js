@@ -8,6 +8,7 @@ export const usePlacesStore = defineStore("places", () => {
 
   const isLoading = ref(true);
   const userLocation = ref(undefined);
+  const historicUserLocations = ref([]);
   const isLoadingPlaces = ref(false);
   const places = ref([]);
 
@@ -21,6 +22,10 @@ export const usePlacesStore = defineStore("places", () => {
   // Actions
   function setLngLat(coords) {
     userLocation.value = [coords.lng, coords.lat];
+    historicUserLocations.value = [
+      ...(historicUserLocations.value || []),
+      userLocation.value,
+    ];
     isLoading.value = false;
   }
 
@@ -85,9 +90,16 @@ export const usePlacesStore = defineStore("places", () => {
     return resp.data.features;
   }
 
+  function removeAllPlaces() {
+    places.value = [];
+    historicUserLocations.value = [];
+    mapStore.removeAllLocations();
+  }
+
   return {
     isLoading,
     userLocation,
+    historicUserLocations,
     isLoadingPlaces,
     places,
 
@@ -96,5 +108,6 @@ export const usePlacesStore = defineStore("places", () => {
     getInitialLocation,
     searchPlacesByTerm,
     updateUserLocation,
+    removeAllPlaces,
   };
 });

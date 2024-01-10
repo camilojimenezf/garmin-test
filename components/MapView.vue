@@ -34,7 +34,7 @@ const initMap = () => {
 
   const myLocationPopup = new mapboxgl.Popup()
     .setLngLat(placesStore.userLocation)
-    .setHTML(`<h4>Aquí estoy</h4><p>Actualmente en Chile</p>`);
+    .setHTML(`<h4>Punto de inicio</h4><p>Actualmente en Chile</p>`);
 
   const myLocationMarker = new mapboxgl.Marker({
     color: "#000000",
@@ -44,7 +44,7 @@ const initMap = () => {
     .addTo(map);
 
   console.log(map);
-  mapStore.setMap(map);
+  mapStore.setMap(map, [myLocationMarker]);
 };
 
 onMounted(() => {

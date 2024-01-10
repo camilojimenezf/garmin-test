@@ -71,8 +71,12 @@ export const useMapStore = defineStore("map", () => {
     });
   }
 
-  function setMap(newMap) {
+  function setMap(newMap, initialMarkers) {
     map.value = newMap;
+
+    if (initialMarkers) {
+      markers.value = initialMarkers;
+    }
   }
 
   function setPlaceMarkers(places) {
@@ -108,8 +112,32 @@ export const useMapStore = defineStore("map", () => {
     console.log("setUserPlaceMarker", lng, lat);
     if (!map.value) return;
 
+    // get current markers lat long
+    const currentLatLongs = [];
+    markers.value.forEach((marker) => {
+      const latLong = marker.getLngLat();
+      currentLatLongs.push(latLong);
+    });
+
+    // remove all markers
     markers.value.forEach((marker) => marker.remove());
     markers.value = [];
+
+    // create previous markers with different color
+    for (const latLong of currentLatLongs) {
+      const popup = new mapboxgl.Popup()
+        .setLngLat([latLong.lng, latLong.lat])
+        .setHTML(`<h3>Previous Location</h3><p>Andaba por aquí!</p>`);
+
+      const marker = new mapboxgl.Marker({
+        color: "#ccc",
+      })
+        .setLngLat([latLong.lng, latLong.lat])
+        .setPopup(popup)
+        .addTo(map.value);
+
+      markers.value.push(marker);
+    }
 
     const popup = new mapboxgl.Popup()
       .setLngLat([lng, lat])
@@ -138,6 +166,21 @@ export const useMapStore = defineStore("map", () => {
     });
   }
 
+  function removeAllLocations() {
+    if (!map.value) return;
+
+    // remove all markers
+    markers.value.forEach((marker) => marker.remove());
+    markers.value = [];
+
+    if (map.value.getLayer("RouteString")) {
+      map.value.removeLayer("RouteString");
+      map.value.removeSource("RouteString");
+      distance.value = undefined;
+      duration.value = undefined;
+    }
+  }
+
   return {
     map,
     markers,
@@ -150,5 +193,6 @@ export const useMapStore = defineStore("map", () => {
     setMap,
     setPlaceMarkers,
     setUserPlaceMarker,
+    removeAllLocations,
   };
 });

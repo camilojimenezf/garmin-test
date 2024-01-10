@@ -1,7 +1,8 @@
 <template>
   <MapView />
   <MyCoordsCard />
-  <MyLocationBtn />
+  <HistoricCoordsCard />
+  <MapActions />
 </template>
 
 <script setup>

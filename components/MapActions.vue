@@ -6,6 +6,9 @@
     <button @click="updateMyLocation" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
       Update my location
     </button>
+    <button @click="removeLocations" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+      Remove locations
+    </button>
   </div>
 </template>
 
@@ -29,6 +32,10 @@ const onMyLocationClicked = () => {
 
 const updateMyLocation = () => {
   placesStore.updateUserLocation();
+};
+
+const removeLocations = () => {
+  placesStore.removeAllPlaces();
 };
 </script>
 
