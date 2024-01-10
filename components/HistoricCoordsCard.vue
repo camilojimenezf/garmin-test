@@ -29,7 +29,7 @@ const placesStore = usePlacesStore();
 <style scoped>
 .card-container {
   position: fixed;
-  top: 70px;
+  top: 40px;
   right: 10px;
   background-color: white;
   max-height: 250px;

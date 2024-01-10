@@ -15,6 +15,7 @@ export const usePlacesStore = defineStore("places", () => {
   const watchPositionId = ref(undefined);
   const isInRoute = ref(false);
   const isUsingGarminGlo = ref(false);
+  const routeName = ref("");
   const routeInfo = ref({
     points: [],
     startedAt: undefined,
@@ -139,6 +140,7 @@ export const usePlacesStore = defineStore("places", () => {
         (new Date().getTime() - routeInfo.value.startedAt.getTime()) / 1000
       ),
       isUsingGarminGlo: isUsingGarminGlo.value,
+      name: routeName.value,
     };
     console.log("route to save", route);
     // Send to API.

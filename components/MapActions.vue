@@ -1,25 +1,29 @@
 <template>
   <div class="flex flex-col btn-container" v-if="isBtnReady">
-    <label class="inline-flex items-center mb-2">
+    <div class="mb-1">
+      <input type="text" v-model="placesStore.routeName" placeholder="Route name..."
+        class="shadow appearance-none border rounded w-full py-1 px-1 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+    </div>
+    <label class="inline-flex items-center mb-1">
       <input type="checkbox" class="form-checkbox h-5 w-5 text-blue-600" v-model="placesStore.isUsingGarminGlo"
         @change="toggleIsUsingGarminGlo"><span class="ml-2 text-gray-700">Use Garmin Glo</span>
     </label>
     <button v-if="!placesStore.isInRoute" @click="placesStore.startRoute"
-      class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-      Init route
+      class="bg-blue-500 hover:bg-blue-700 text-white py-1 px-1 rounded">
+      Init Route
     </button>
     <button v-if="placesStore.isInRoute" @click="placesStore.endRoute"
-      class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-      End route
+      class="bg-blue-500 hover:bg-blue-700 text-white py-1 px-1 rounded">
+      End Route
     </button>
-    <button @click="onMyLocationClicked" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-      Go to my location
+    <button @click="onMyLocationClicked" class="bg-blue-500 hover:bg-blue-700 text-white py-1 px-1 rounded">
+      My Location
     </button>
-    <button @click="updateMyLocation" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-      Update my location
+    <button @click="updateMyLocation" class="bg-blue-500 hover:bg-blue-700 text-white py-1 px-1 rounded">
+      Set Location
     </button>
-    <button @click="removeLocations" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-      Remove locations
+    <button @click="removeLocations" class="bg-blue-500 hover:bg-blue-700 text-white py-1 px-1 rounded">
+      Remove All
     </button>
   </div>
 </template>
@@ -55,11 +59,12 @@ const removeLocations = () => {
 <style scoped>
 .btn-container {
   position: fixed;
-  bottom: 70px;
+  bottom: 5px;
   right: 10px;
+  max-width: 150px;
 }
 
 .btn-container button {
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 </style>

@@ -21,7 +21,7 @@ const placesStore = usePlacesStore();
 <style scoped>
 .card-container {
   position: fixed;
-  top: 70px;
+  top: 40px;
   left: 10px;
   background-color: white;
 }

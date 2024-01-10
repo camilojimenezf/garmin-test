@@ -1,7 +1,7 @@
 <template>
   <div>
     <header>
-      <ul class="flex flex-row bg-green-500 py-4">
+      <ul class="flex flex-row bg-green-500 py-1 px-2">
         <li class="mr-4">
           <NuxtLink to="/garminconnection" class="text-white hover:text-green-200 font-semibold">Garmin Connection
           </NuxtLink>
