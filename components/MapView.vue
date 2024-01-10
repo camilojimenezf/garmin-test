@@ -20,8 +20,6 @@ const mapStore = useMapStore();
 const mapElement = ref();
 
 const initMap = () => {
-  console.log('isUserLocationReady', placesStore.isUserLocationReady);
-  console.log('userLocation', placesStore.userLocation);
   if (!mapElement.value) throw new Error("Map element not found");
   if (!placesStore.userLocation) throw new Error("User location not found");
 
@@ -43,7 +41,6 @@ const initMap = () => {
     .setPopup(myLocationPopup)
     .addTo(map);
 
-  console.log(map);
   mapStore.setMap(map, [myLocationMarker]);
 };
 
@@ -54,8 +51,6 @@ onMounted(() => {
 });
 
 watch(() => placesStore.isUserLocationReady, (newValue) => {
-  console.log('isUserLocationReady', newValue);
-  console.log('userLocation', placesStore.isUserLocationReady.value);
   if (newValue) {
     nextTick(() => initMap());
   }

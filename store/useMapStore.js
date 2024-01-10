@@ -109,7 +109,6 @@ export const useMapStore = defineStore("map", () => {
   }
 
   function setUserPlaceMarker({ lng, lat }) {
-    console.log("setUserPlaceMarker", lng, lat);
     if (!map.value) return;
 
     // get current markers lat long

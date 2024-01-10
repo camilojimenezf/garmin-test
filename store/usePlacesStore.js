@@ -40,19 +40,24 @@ export const usePlacesStore = defineStore("places", () => {
 
   function getInitialLocation() {
     navigator.geolocation.getCurrentPosition(
-      ({ coords }) =>
-        setLngLat({ lng: coords.longitude, lat: coords.latitude }),
+      (props) => {
+        console.log("Current Position Geolocation Info", props);
+        const coords = props.coords;
+        setLngLat({ lng: coords.longitude, lat: coords.latitude });
+      },
       (err) => {
         console.error(err);
         throw new Error("No geolocation :(");
-      }
+      },
+      { enableHighAccuracy: true }
     );
   }
 
   function updateUserLocation() {
     navigator.geolocation.getCurrentPosition(
-      ({ coords }) => {
-        console.log("coords", coords);
+      (props) => {
+        console.log("Current Position Geolocation Info", props);
+        const coords = props.coords;
         setLngLat({ lng: coords.longitude, lat: coords.latitude });
         mapStore.setUserPlaceMarker({
           lng: coords.longitude,
