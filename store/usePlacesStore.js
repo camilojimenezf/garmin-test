@@ -124,6 +124,7 @@ export const usePlacesStore = defineStore("places", () => {
     isInRoute.value = false;
     routeInfo.value.startedAt = undefined;
     routeInfo.value.points = [];
+    routeName.value = "";
     navigator.geolocation.clearWatch(watchPositionId.value);
   }
 
@@ -202,6 +203,7 @@ export const usePlacesStore = defineStore("places", () => {
     isInRoute,
     routeInfo,
     isUsingGarminGlo,
+    routeName,
 
     isUserLocationReady,
 
