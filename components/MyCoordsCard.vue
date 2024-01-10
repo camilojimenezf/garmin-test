@@ -1,5 +1,5 @@
 <template>
-  <div class="card-container rounded shadow-lg p-4">
+  <div v-if="placesStore.isUserLocationReady" class="card-container rounded shadow-lg p-4">
     <div class="px-6 py-4">
       <div class="font-bold text-xl mb-2">Map Coordinates</div>
       <p class="text-gray-700 text-base">
