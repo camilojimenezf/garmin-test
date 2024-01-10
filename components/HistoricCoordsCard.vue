@@ -32,7 +32,9 @@ const placesStore = usePlacesStore();
   top: 40px;
   right: 10px;
   background-color: white;
-  max-height: 250px;
+  max-height: 150px;
+  max-width: 150px;
   overflow-y: scroll;
+  overflow-x: hidden;
 }
 </style>
