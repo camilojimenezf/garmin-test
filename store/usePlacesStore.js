@@ -21,7 +21,7 @@ export const usePlacesStore = defineStore("places", () => {
 
   // Actions
   function setLngLat(coords) {
-    userLocation.value = [coords.lng, coords.lat];
+    userLocation.value = [coords.lng, coords.lat, coords.accuracy];
     historicUserLocations.value = [
       ...(historicUserLocations.value || []),
       userLocation.value,
@@ -43,7 +43,11 @@ export const usePlacesStore = defineStore("places", () => {
       (props) => {
         console.log("Current Position Geolocation Info", props);
         const coords = props.coords;
-        setLngLat({ lng: coords.longitude, lat: coords.latitude });
+        setLngLat({
+          lng: coords.longitude,
+          lat: coords.latitude,
+          accuracy: coords.accuracy,
+        });
       },
       (err) => {
         console.error(err);
@@ -58,7 +62,11 @@ export const usePlacesStore = defineStore("places", () => {
       (props) => {
         console.log("Current Position Geolocation Info", props);
         const coords = props.coords;
-        setLngLat({ lng: coords.longitude, lat: coords.latitude });
+        setLngLat({
+          lng: coords.longitude,
+          lat: coords.latitude,
+          accuracy: coords.accuracy,
+        });
         mapStore.setUserPlaceMarker({
           lng: coords.longitude,
           lat: coords.latitude,

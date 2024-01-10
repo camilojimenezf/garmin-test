@@ -12,6 +12,9 @@
         <p class="text-gray-700 text-sm">
           Latitude: {{ location[1] }}
         </p>
+        <p class="text-gray-700 text-sm">
+          Accuracy: {{ location[2] }}
+        </p>
       </div>
     </div>
   </div>
