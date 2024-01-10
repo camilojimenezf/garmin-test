@@ -1,6 +1,7 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
 import { searchApi } from "../../apis"; // Update this path to your API module
+import { saveRoute } from "~/apis/apiService";
 import { useMapStore } from "./useMapStore";
 
 export const usePlacesStore = defineStore("places", () => {
@@ -11,6 +12,13 @@ export const usePlacesStore = defineStore("places", () => {
   const historicUserLocations = ref([]);
   const isLoadingPlaces = ref(false);
   const places = ref([]);
+  const watchPositionId = ref(undefined);
+  const isInRoute = ref(false);
+  const isUsingGarminGlo = ref(false);
+  const routeInfo = ref({
+    points: [],
+    startedAt: undefined,
+  });
 
   onMounted(() => {
     getInitialLocation();
@@ -80,6 +88,62 @@ export const usePlacesStore = defineStore("places", () => {
     );
   }
 
+  function startRoute() {
+    console.log("startRoute");
+    removeAllPlaces();
+    isInRoute.value = true;
+    routeInfo.value.startedAt = new Date();
+
+    watchPositionId.value = navigator.geolocation.watchPosition(
+      (props) => {
+        const coords = props.coords;
+        setLngLat({
+          lng: coords.longitude,
+          lat: coords.latitude,
+          accuracy: coords.accuracy,
+        });
+        mapStore.setUserPlaceMarker({
+          lng: coords.longitude,
+          lat: coords.latitude,
+        });
+      },
+      (err) => {
+        console.error(err);
+        throw new Error("No geolocation :(");
+      },
+      { enableHighAccuracy: true }
+    );
+  }
+
+  function endRoute() {
+    console.log("endRoute");
+    console.log(routeInfo);
+    createRoute();
+    removeAllPlaces();
+    isInRoute.value = false;
+    routeInfo.value.startedAt = undefined;
+    routeInfo.value.points = [];
+    navigator.geolocation.clearWatch(watchPositionId.value);
+  }
+
+  function createRoute() {
+    const route = {
+      points: routeInfo.value.points.map((point) => ({
+        lng: point.lng,
+        lat: point.lat,
+        accuracy: point.accuracy,
+      })),
+      finishedAt: new Date(),
+      duration: Math.abs(
+        (new Date().getTime() - routeInfo.value.startedAt.getTime()) / 1000
+      ),
+      isUsingGarminGlo: isUsingGarminGlo.value,
+    };
+    console.log("route to save", route);
+    // Send to API.
+    saveRoute(route);
+  }
+
   async function searchPlacesByTerm(term) {
     if (term.length === 0) {
       setPlaces([]);
@@ -109,12 +173,32 @@ export const usePlacesStore = defineStore("places", () => {
     mapStore.removeAllLocations();
   }
 
+  function toggleIsUsingGarminGlo() {
+    isUsingGarminGlo.value = !isUsingGarminGlo.value;
+  }
+
+  watch(historicUserLocations, (newLocations) => {
+    if (isInRoute.value && newLocations && newLocations.length > 1) {
+      const lastLocation = Array.from(newLocations[newLocations.length - 1]);
+      console.log("lastLocation", lastLocation);
+      routeInfo.value.points.push({
+        lng: lastLocation[0],
+        lat: lastLocation[1],
+        accuracy: lastLocation[2],
+      });
+      mapStore.drawRoute(newLocations);
+    }
+  });
+
   return {
     isLoading,
     userLocation,
     historicUserLocations,
     isLoadingPlaces,
     places,
+    isInRoute,
+    routeInfo,
+    isUsingGarminGlo,
 
     isUserLocationReady,
 
@@ -122,5 +206,8 @@ export const usePlacesStore = defineStore("places", () => {
     searchPlacesByTerm,
     updateUserLocation,
     removeAllPlaces,
+    startRoute,
+    endRoute,
+    toggleIsUsingGarminGlo,
   };
 });

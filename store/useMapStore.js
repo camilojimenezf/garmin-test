@@ -180,6 +180,42 @@ export const useMapStore = defineStore("map", () => {
     }
   }
 
+  function drawRoute(locations) {
+    if (!map.value || locations.length < 2) return;
+    const coordinates = locations.map((loc) => [loc[0], loc[1]]);
+
+    // Add the polyline to the map
+    const sourceData = {
+      type: "geojson",
+      data: {
+        type: "Feature",
+        properties: {},
+        geometry: {
+          type: "LineString",
+          coordinates,
+        },
+      },
+    };
+
+    if (map.value.getLayer("RouteString")) {
+      map.value.getSource("RouteString").setData(sourceData.data);
+    } else {
+      map.value.addLayer({
+        id: "RouteString",
+        type: "line",
+        source: sourceData,
+        layout: {
+          "line-join": "round",
+          "line-cap": "round",
+        },
+        paint: {
+          "line-color": "#ff0000",
+          "line-width": 4,
+        },
+      });
+    }
+  }
+
   return {
     map,
     markers,
@@ -193,5 +229,6 @@ export const useMapStore = defineStore("map", () => {
     setPlaceMarkers,
     setUserPlaceMarker,
     removeAllLocations,
+    drawRoute,
   };
 });
