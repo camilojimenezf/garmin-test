@@ -128,6 +128,7 @@ export const usePlacesStore = defineStore("places", () => {
 
   function createRoute() {
     const route = {
+      userAgent: navigator.userAgent || navigator.vendor,
       points: routeInfo.value.points.map((point) => ({
         lng: point.lng,
         lat: point.lat,
