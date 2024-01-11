@@ -95,6 +95,9 @@ export const usePlacesStore = defineStore("places", () => {
     isInRoute.value = true;
     routeInfo.value.startedAt = new Date();
 
+    let lastUpdateTimestamp = Date.now(); // Store the last update time
+    const updateThreshold = 3000; // 3 seconds - adjust as needed
+
     watchPositionId.value = navigator.geolocation.watchPosition(
       (props) => {
         const coords = props.coords;
@@ -103,10 +106,15 @@ export const usePlacesStore = defineStore("places", () => {
           lat: coords.latitude,
           accuracy: coords.accuracy,
         });
-        mapStore.setUserPlaceMarker({
-          lng: coords.longitude,
-          lat: coords.latitude,
-        });
+        // Update the marker only if the threshold time has elapsed
+        const currentTime = Date.now();
+        if (currentTime - lastUpdateTimestamp > updateThreshold) {
+          lastUpdateTimestamp = currentTime; // Update the last update time
+          mapStore.setUserPlaceMarker({
+            lng: coords.longitude,
+            lat: coords.latitude,
+          });
+        }
       },
       (err) => {
         console.error(err);
