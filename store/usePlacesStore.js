@@ -190,7 +190,8 @@ export const usePlacesStore = defineStore("places", () => {
         lat: lastLocation[1],
         accuracy: lastLocation[2],
       });
-      mapStore.drawRoute(newLocations);
+      // TODO: improve route re-drawing only last two points
+      // mapStore.drawRoute(newLocations);
     }
   });
 
