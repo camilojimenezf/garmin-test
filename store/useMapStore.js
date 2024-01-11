@@ -168,10 +168,11 @@ export const useMapStore = defineStore("map", () => {
     }
 
     console.log("flyTo", lng, lat);
-    map.value.flyTo({
-      center: [lng, lat],
-      zoom: 20,
-    });
+    // TODO: fly to when is in route but with delay
+    // map.value.flyTo({
+    //   center: [lng, lat],
+    //   zoom: 20,
+    // });
   }
 
   function removeAllLocations() {
