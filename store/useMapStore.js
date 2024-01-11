@@ -111,32 +111,41 @@ export const useMapStore = defineStore("map", () => {
   function setUserPlaceMarker({ lng, lat }) {
     if (!map.value) return;
 
-    // get current markers lat long
-    const currentLatLongs = [];
-    markers.value.forEach((marker) => {
-      const latLong = marker.getLngLat();
-      currentLatLongs.push(latLong);
-    });
+    // // get current markers lat long
+    // const currentLatLongs = [];
+    // markers.value.forEach((marker) => {
+    //   const latLong = marker.getLngLat();
+    //   currentLatLongs.push(latLong);
+    // });
 
-    // remove all markers
-    markers.value.forEach((marker) => marker.remove());
-    markers.value = [];
+    // // remove all markers
+    // markers.value.forEach((marker) => marker.remove());
+    // markers.value = [];
 
-    // create previous markers with different color
-    for (const latLong of currentLatLongs) {
-      const popup = new mapboxgl.Popup()
-        .setLngLat([latLong.lng, latLong.lat])
-        .setHTML(`<h3>Previous Location</h3><p>Andaba por aquí!</p>`);
+    // // create previous markers with different color
+    // for (const latLong of currentLatLongs) {
+    //   const popup = new mapboxgl.Popup()
+    //     .setLngLat([latLong.lng, latLong.lat])
+    //     .setHTML(`<h3>Previous Location</h3><p>Andaba por aquí!</p>`);
 
-      const marker = new mapboxgl.Marker({
-        color: "#ccc",
-      })
-        .setLngLat([latLong.lng, latLong.lat])
-        .setPopup(popup)
-        .addTo(map.value);
+    //   const marker = new mapboxgl.Marker({
+    //     color: "#ccc",
+    //   })
+    //     .setLngLat([latLong.lng, latLong.lat])
+    //     .setPopup(popup)
+    //     .addTo(map.value);
 
-      markers.value.push(marker);
-    }
+    //   markers.value.push(marker);
+    // }
+
+    // Update existing markers' color
+    // markers.value.forEach((marker) => {
+    //   // Assuming Mapbox GL JS allows updating marker options like color
+    //   marker.getElement().style.backgroundColor = "#ccc";
+    //   // Update popup content if needed
+    //   const popup = marker.getPopup();
+    //   popup.setHTML(`<h3>Previous Location</h3><p>Andaba por aquí!</p>`);
+    // });
 
     const popup = new mapboxgl.Popup()
       .setLngLat([lng, lat])
