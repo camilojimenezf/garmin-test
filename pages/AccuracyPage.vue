@@ -6,7 +6,7 @@
 
     <ul v-if="accuracy.hasPositions">
       <li v-for="(position, index) in accuracy.positions.value" :key="`${position.lat},${position.lng},${index}`">
-        {{ position.lat }}, {{ position.lng }}, {{ index }}
+        {{ position.lat }}, {{ position.lng }} - {{ position.accuracy }}
       </li>
     </ul>
   </div>

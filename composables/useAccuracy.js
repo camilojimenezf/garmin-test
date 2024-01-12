@@ -24,24 +24,47 @@ export const useAccuracy = () => {
   const status = ref(STATES.UNKNOWN);
   const medianAccuracy = ref(undefined);
 
+  // function startTracking() {
+  //   watchPositionId.value = navigator.geolocation.watchPosition(
+  //     ({ coords }) => {
+  //       const newCoords = {
+  //         lng: coords.longitude,
+  //         lat: coords.latitude,
+  //         accuracy: coords.accuracy,
+  //       };
+  //       const updatedPositions = positions.value.slice(-MEDIAN_SAMPLE_SIZE);
+  //       updatedPositions.push(newCoords);
+  //       positions.value = updatedPositions;
+  //     },
+  //     (err) => {
+  //       console.error(err);
+  //       throw new Error("No geolocation :(");
+  //     },
+  //     { enableHighAccuracy: true }
+  //   );
+  // }
+
   function startTracking() {
-    watchPositionId.value = navigator.geolocation.watchPosition(
-      ({ coords }) => {
-        const newCoords = {
-          lng: coords.longitude,
-          lat: coords.latitude,
-          accuracy: coords.accuracy,
-        };
-        const updatedPositions = positions.value.slice(-MEDIAN_SAMPLE_SIZE);
-        updatedPositions.push(newCoords);
-        positions.value = updatedPositions;
-      },
-      (err) => {
-        console.error(err);
-        throw new Error("No geolocation :(");
-      },
-      { enableHighAccuracy: true }
-    );
+    watchPositionId.value = setInterval(() => {
+      navigator.geolocation.getCurrentPosition(
+        ({ coords }) => {
+          const newCoords = {
+            lng: coords.longitude,
+            lat: coords.latitude,
+            accuracy: coords.accuracy,
+          };
+          console.log("newCoords", newCoords);
+          const updatedPositions = positions.value.slice(-MEDIAN_SAMPLE_SIZE);
+          updatedPositions.push(newCoords);
+          positions.value = updatedPositions;
+        },
+        (err) => {
+          console.error(err);
+          throw new Error("No geolocation :(");
+        },
+        { enableHighAccuracy: true }
+      );
+    }, 1000);
   }
 
   onMounted(() => {
@@ -49,7 +72,9 @@ export const useAccuracy = () => {
   });
 
   onUnmounted(() => {
-    navigator.geolocation.clearWatch(watchPositionId.value);
+    console.log("onUnmounted clear Interval");
+    // navigator.geolocation.clearWatch(watchPositionId.value);
+    clearInterval(watchPositionId.value);
   });
 
   watch(positions, (newPositions) => {
