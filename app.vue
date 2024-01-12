@@ -9,8 +9,12 @@
         <li class="mr-4">
           <NuxtLink to="/mappage" class="text-white hover:text-green-200 font-semibold">Map View</NuxtLink>
         </li>
-        <li>
+        <li class="mr-4">
           <NuxtLink to="/accuracypage" class="text-white hover:text-green-200 font-semibold">Accuracy</NuxtLink>
+        </li>
+        <li class="mr-4">
+          <NuxtLink to="/garmintutorialpage" class="text-white hover:text-green-200 font-semibold">Garmin Tutorial
+          </NuxtLink>
         </li>
       </ul>
     </header>
