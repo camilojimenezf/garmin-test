@@ -6,8 +6,11 @@
           <NuxtLink to="/garminconnection" class="text-white hover:text-green-200 font-semibold">Garmin Connection
           </NuxtLink>
         </li>
-        <li>
+        <li class="mr-4">
           <NuxtLink to="/mappage" class="text-white hover:text-green-200 font-semibold">Map View</NuxtLink>
+        </li>
+        <li>
+          <NuxtLink to="/accuracypage" class="text-white hover:text-green-200 font-semibold">Accuracy</NuxtLink>
         </li>
       </ul>
     </header>
