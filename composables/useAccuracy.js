@@ -53,7 +53,7 @@ export const useAccuracy = () => {
             lat: coords.latitude,
             accuracy: coords.accuracy,
           };
-          console.log("newCoords", newCoords);
+
           const updatedPositions = positions.value.slice(-MEDIAN_SAMPLE_SIZE);
           updatedPositions.push(newCoords);
           positions.value = updatedPositions;

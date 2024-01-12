@@ -1,5 +1,5 @@
 <template>
-  <div :class="cardColor" :style="cardStyle" class="max-w-sm m-2 rounded overflow-hidden shadow-lg p-4 text-white">
+  <div :class="cardColor" :style="cardStyle" class="pulse max-w-sm m-2 rounded overflow-hidden shadow-lg p-4 text-white">
     <p>Status: {{ accuracy.status }}</p>
     <p>Median Accuracy: {{ accuracy.medianAccuracy }}</p>
   </div>
@@ -44,4 +44,20 @@ const cardStyle = computed(() => ({
 }));
 </script>
 
-<style scoped></style>
+<style scoped>
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: .8;
+  }
+}
+
+.pulse {
+  animation: pulse 1s infinite;
+}
+</style>
