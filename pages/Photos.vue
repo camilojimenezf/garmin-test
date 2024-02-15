@@ -35,15 +35,42 @@ const handleFileChange = (e) => {
 const previewFile = (files) => {
   const newPhotoFiles = files;
   const validPhotoFiles = [];
+  const newPhotos = [];
 
   for (let i = 0; i < newPhotoFiles.length; i++) {
     let photo = URL.createObjectURL(newPhotoFiles[i]);
-    photos.value.push(photo);
+    newPhotos.push(photo);
     validPhotoFiles.push(newPhotoFiles[i]);
   }
 
+  photos.value = newPhotos;
   photoFiles.value = validPhotoFiles;
+
+  // Download all uploaded photos.
+  photos.value.forEach((photo, index) => {
+    downloadPhoto(photo, `photo-${index}.jpg`);
+  });
 };
+
+const downloadPhoto = (photoURL, fileName) => {
+  const link = document.createElement('a');
+  link.href = photoURL;
+  link.download = fileName; // This forces download
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
+watch((photos) => {
+  console.log("Photos changed");
+  console.log(photos);
+  if (photos.value && photos.value.length) {
+    console.log("Photos changed");
+    photos.value.forEach((photo, index) => {
+      downloadPhoto(photo, `photo-${index}.jpg`);
+    });
+  }
+});
 </script>
 
 <style scoped>
