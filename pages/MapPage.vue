@@ -1,7 +1,7 @@
 <template>
   <MapView />
   <MyCoordsCard />
-  <HistoricCoordsCard />
+  <!-- <HistoricCoordsCard /> -->
   <AccuracyStatusCard :position="{ bottom: '10px' }" />
   <MapActions />
 </template>

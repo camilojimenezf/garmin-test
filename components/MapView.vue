@@ -41,6 +41,8 @@ const initMap = () => {
     .setPopup(myLocationPopup)
     .addTo(map);
 
+  map.addControl(new mapboxgl.FullscreenControl());
+
   mapStore.setMap(map, [myLocationMarker]);
 };
 
