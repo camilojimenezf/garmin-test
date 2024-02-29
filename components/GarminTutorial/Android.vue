@@ -68,14 +68,14 @@ const tutorialSteps = ref([
       },
       {
         title: "Install Bluetooth GPS",
-        content: "Install Bluetooth GPS app on your device.",
+        content: "Install 'GPS Connector' app on your device.",
         image: "/images/garmin/android/06-install-gps-connector.jpg"
       }
     ]
   },
   {
     title: "Enable Mock App",
-    content: "You need to enable Mock App in Developer Options.",
+    content: "You need to enable Mock App in Settings -> Developer Options.",
     substeps: [
       {
         title: "Go to Developer Options",
@@ -95,7 +95,7 @@ const tutorialSteps = ref([
     substeps: [
       {
         title: "Turn on Garmin Glo",
-        content: "Turn on Garmin Glo by pressing and holding power button for 2-3 seconds. If you see blue light blinking it means that Garmin Glo is turned on.",
+        content: "Turn on Garmin Glo by pressing and holding power button for 2-3 seconds. If you see blue light blinking it means that Garmin Glo is turned on and ready to pair.",
         image: "/images/garmin/android/09-turn-on-garmin.jpg"
       },
       {
@@ -127,4 +127,4 @@ const tutorialSteps = ref([
 ])
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped></style>
