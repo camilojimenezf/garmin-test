@@ -42,6 +42,16 @@ const initMap = () => {
     .addTo(map);
 
   map.addControl(new mapboxgl.FullscreenControl());
+  map.addControl(new mapboxgl.GeolocateControl({
+    positionOptions: {
+      enableHighAccuracy: true,
+      timeout: 5000,
+      maximumAge: 0,
+    },
+    trackUserLocation: true,
+    showAccuracyCircle: true,
+    showUserHeading: true,
+  }))
 
   mapStore.setMap(map, [myLocationMarker]);
 };
