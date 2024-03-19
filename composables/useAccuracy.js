@@ -63,20 +63,35 @@ export const useAccuracy = () => {
         //   return;
         // }
 
+        // if we doesn't have a current location, set it to the new coords
+        if (!currentLocation.value) {
+          currentLocation.value = newCoords;
+        }
+
         const smoothedLocation = calculateSmoothedLocation();
         console.log("smoothedLocation", smoothedLocation);
+
+        // If smoothed location is the same that current location not update
+        if (
+          smoothedLocation &&
+          currentLocation.value?.lat === smoothedLocation.lat &&
+          currentLocation.value?.lng === smoothedLocation.lng
+        ) {
+          return;
+        }
+
         if (smoothedLocation) {
           currentLocation.value = smoothedLocation;
         }
 
         // If coordinates are the same, don't update current location.
-        if (
-          currentLocation.value?.lat === newCoords.lat &&
-          currentLocation.value?.lng === newCoords.lng
-        ) {
-          return;
-        }
-        currentLocation.value = newCoords;
+        // if (
+        //   currentLocation.value?.lat === newCoords.lat &&
+        //   currentLocation.value?.lng === newCoords.lng
+        // ) {
+        //   return;
+        // }
+        // currentLocation.value = newCoords;
       },
       (err) => {
         console.error(err);
