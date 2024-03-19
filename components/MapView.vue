@@ -10,14 +10,58 @@
 </template>
 
 <script setup>
+const UPDATE_COORDINATES_INTERVAL = 150;
+
 import mapboxgl from "mapbox-gl";
 
 import { usePlacesStore } from '~/store/usePlacesStore';
 import { useMapStore } from '~/store/useMapStore';
+import { useAccuracy } from '~/composables/useAccuracy';
 
 const placesStore = usePlacesStore();
 const mapStore = useMapStore();
+const { currentLocation, medianAccuracy } = useAccuracy();
+
 const mapElement = ref();
+
+// Implement our own geolocation to use location of our store.
+const customGeolocation = {
+  watchIdCounter: 0,
+  watches: {},
+  getCurrentPosition(successCallback, errorCallback, options) { },
+  watchPosition(successCallback, errorCallback, options) {
+    const id = ++this.watchIdCounter;
+
+    const invokeSuccess = () => {
+      if (currentLocation.value.lat && currentLocation.value.lng) {
+        const position = {
+          coords: {
+            latitude: currentLocation.value.lat,
+            longitude: currentLocation.value.lng,
+            accuracy: medianAccuracy.value || 1000,
+          },
+          timestamp: Date.now(),
+        };
+        successCallback(position);
+      }
+    };
+
+    invokeSuccess();
+
+    this.watches[id] = setInterval(() => {
+      invokeSuccess();
+    }, UPDATE_COORDINATES_INTERVAL);
+
+    return id;
+  },
+
+  clearWatch(watchId) {
+    if (this.watches[watchId]) {
+      clearInterval(this.watches[watchId]);
+      delete this.watches[watchId];
+    }
+  },
+};
 
 const initMap = () => {
   if (!mapElement.value) throw new Error("Map element not found");
@@ -30,30 +74,26 @@ const initMap = () => {
     zoom: 15, // starting zoom
   });
 
-  const myLocationPopup = new mapboxgl.Popup()
-    .setLngLat(placesStore.userLocation)
-    .setHTML(`<h4>Punto de inicio</h4><p>Actualmente en Chile</p>`);
+  // const myLocationPopup = new mapboxgl.Popup()
+  //   .setLngLat(placesStore.userLocation)
+  //   .setHTML(`<h4>Punto de inicio</h4><p>Actualmente en Chile</p>`);
 
-  const myLocationMarker = new mapboxgl.Marker({
-    color: "#000000",
-  })
-    .setLngLat(placesStore.userLocation)
-    .setPopup(myLocationPopup)
-    .addTo(map);
+  // const myLocationMarker = new mapboxgl.Marker({
+  //   color: "#000000",
+  // })
+  //   .setLngLat(placesStore.userLocation)
+  //   .setPopup(myLocationPopup)
+  //   .addTo(map);
 
   map.addControl(new mapboxgl.FullscreenControl());
   map.addControl(new mapboxgl.GeolocateControl({
-    positionOptions: {
-      enableHighAccuracy: true,
-      timeout: 5000,
-      maximumAge: 0,
-    },
     trackUserLocation: true,
     showAccuracyCircle: true,
     showUserHeading: true,
+    geolocation: customGeolocation,
   }))
 
-  mapStore.setMap(map, [myLocationMarker]);
+  // mapStore.setMap(map, [myLocationMarker]);
 };
 
 onMounted(() => {
@@ -86,4 +126,4 @@ watch(() => placesStore.isUserLocationReady, (newValue) => {
   height: 100vh;
   width: 100vw;
 }
-</style>
+</style>useAccuracy,
