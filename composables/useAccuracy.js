@@ -16,7 +16,8 @@ const STATES = {
 };
 
 const ACCURACY_THRESHOLD = 6;
-const MEDIAN_SAMPLE_SIZE = 20;
+const MIN_ACCURACY_TO_UPDATE_POSITION = 20;
+const MEDIAN_SAMPLE_SIZE = 30;
 const GET_POSITION_INTERVAL = 200;
 const MINIMUM_MOVE_DISTANCE = 10;
 
@@ -56,6 +57,11 @@ export const useAccuracy = () => {
         const updatedPositions = positions.value.slice(-MEDIAN_SAMPLE_SIZE);
         updatedPositions.push(newCoords);
         positions.value = updatedPositions;
+
+        // if (coords.accuracy > MIN_ACCURACY_TO_UPDATE_POSITION) {
+        //   console.log("Ignored due to low accuracy", coords.accuracy);
+        //   return;
+        // }
 
         const smoothedLocation = calculateSmoothedLocation();
         console.log("smoothedLocation", smoothedLocation);
