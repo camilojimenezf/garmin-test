@@ -16,8 +16,8 @@ const STATES = {
 };
 
 const ACCURACY_THRESHOLD = 6;
-const MEDIAN_SAMPLE_SIZE = 5;
-const GET_POSITION_INTERVAL = 500;
+const MEDIAN_SAMPLE_SIZE = 20;
+const GET_POSITION_INTERVAL = 200;
 const MINIMUM_MOVE_DISTANCE = 10;
 
 export const useAccuracy = () => {
