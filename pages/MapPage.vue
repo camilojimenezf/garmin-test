@@ -1,5 +1,7 @@
 <template>
   <MapView />
+  <SelectCalculateLocationMode />
+  <ConfigLocationParameters />
   <MyCoordsCard />
   <!-- <HistoricCoordsCard /> -->
   <AccuracyStatusCard :position="{ bottom: '10px' }" />
