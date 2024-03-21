@@ -1,3 +1,5 @@
+import KalmanFilter from "kalmanjs";
+
 function median(numbers) {
   const mid = Math.floor(numbers.length / 2);
   const sortedNumbers = numbers.sort((a, b) => a - b);
@@ -17,7 +19,7 @@ const STATES = {
 
 const ACCURACY_THRESHOLD = 6;
 const MIN_ACCURACY_TO_UPDATE_POSITION = 20;
-const MEDIAN_SAMPLE_SIZE = 30;
+const MEDIAN_SAMPLE_SIZE = 50;
 const GET_POSITION_INTERVAL = 200;
 const MINIMUM_MOVE_DISTANCE = 10;
 
@@ -27,6 +29,23 @@ export const useAccuracy = () => {
   const status = ref(STATES.UNKNOWN);
   const medianAccuracy = ref(undefined);
   const currentLocation = ref(undefined);
+
+  function calculateSmoothedLocationKalman() {
+    console.log("calculateSmoothedLocationKalman");
+    const kfLat = new KalmanFilter({ R: 0.01, Q: 3 }); // Example parameters
+    const kfLng = new KalmanFilter({ R: 0.01, Q: 3 }); // Example parameters
+    const recentPositions = positions.value.slice(-MEDIAN_SAMPLE_SIZE);
+
+    if (recentPositions.length < 2) return; // Need at least 2 to predict
+
+    let smoothedLats = recentPositions.map((pos) => kfLat.filter(pos.lat));
+    let smoothedLngs = recentPositions.map((pos) => kfLng.filter(pos.lng));
+
+    const lastLat = smoothedLats[smoothedLats.length - 1];
+    const lastLng = smoothedLngs[smoothedLngs.length - 1];
+
+    return { lat: lastLat, lng: lastLng };
+  }
 
   function calculateSmoothedLocation() {
     const recentPositions = positions.value.slice(-MEDIAN_SAMPLE_SIZE);
@@ -68,7 +87,7 @@ export const useAccuracy = () => {
           currentLocation.value = newCoords;
         }
 
-        const smoothedLocation = calculateSmoothedLocation();
+        const smoothedLocation = calculateSmoothedLocationKalman();
         console.log("smoothedLocation", smoothedLocation);
 
         // If smoothed location is the same that current location not update
