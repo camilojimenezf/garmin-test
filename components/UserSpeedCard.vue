@@ -1,11 +1,6 @@
 <template>
   <div class="card-container rounded shadow-lg p-1">
-    <div class="px-2 py-2">
-      <div class="font-bold text-md mb-2">Speed</div>
-      <p class="text-gray-700 text-sm">
-        User Speed: {{ userSpeed }} KM/H
-      </p>
-    </div>
+    <div class="font-bold text-md">{{ userSpeed }} KM/H</div>
   </div>
 </template>
 
@@ -21,8 +16,8 @@ const { userSpeed } = storeToRefs(mapConfigStore);
 <style scoped>
 .card-container {
   position: fixed;
-  top: 40px;
-  left: 100px;
+  top: 60px;
+  right: 55px;
   background-color: white;
 }
 </style>
