@@ -3,7 +3,7 @@
   <SelectCalculateLocationMode />
   <ConfigLocationParameters />
   <MyCoordsCard />
-  <!-- <HistoricCoordsCard /> -->
+  <UserSpeedCard />
   <AccuracyStatusCard :position="{ bottom: '10px' }" />
   <MapActions />
 </template>

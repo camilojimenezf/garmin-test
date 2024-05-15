@@ -72,18 +72,8 @@ const initMap = () => {
     style: "mapbox://styles/mapbox/light-v11", // style URL
     center: placesStore.userLocation, // starting position [lng, lat]
     zoom: 15, // starting zoom
+    maxZoom: 20,
   });
-
-  // const myLocationPopup = new mapboxgl.Popup()
-  //   .setLngLat(placesStore.userLocation)
-  //   .setHTML(`<h4>Punto de inicio</h4><p>Actualmente en Chile</p>`);
-
-  // const myLocationMarker = new mapboxgl.Marker({
-  //   color: "#000000",
-  // })
-  //   .setLngLat(placesStore.userLocation)
-  //   .setPopup(myLocationPopup)
-  //   .addTo(map);
 
   map.addControl(new mapboxgl.FullscreenControl());
   map.addControl(new mapboxgl.GeolocateControl({
@@ -92,6 +82,7 @@ const initMap = () => {
     showUserHeading: true,
     geolocation: customGeolocation,
   }))
+  map.addControl(new mapboxgl.NavigationControl());
 
   // mapStore.setMap(map, [myLocationMarker]);
 };

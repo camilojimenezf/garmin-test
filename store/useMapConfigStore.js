@@ -7,6 +7,7 @@ export const useMapConfigStore = defineStore("mapConfig", () => {
   const kalmanQ = ref(3);
   const kalmanR = ref(0.01);
   const medianSampleSize = ref(50);
+  const userSpeed = ref(0);
 
   // Methods
   function setCalculationMode(mode) {
@@ -25,15 +26,21 @@ export const useMapConfigStore = defineStore("mapConfig", () => {
     medianSampleSize.value = value;
   }
 
+  function setUserSpeed(value) {
+    userSpeed.value = value;
+  }
+
   return {
     calculateLocationMode,
     kalmanQ,
     kalmanR,
     medianSampleSize,
+    userSpeed,
 
     setCalculationMode,
     setKalmanQ,
     setKalmanR,
     setMedianSampleSize,
+    setUserSpeed,
   };
 });
