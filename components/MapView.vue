@@ -17,9 +17,13 @@ import mapboxgl from "mapbox-gl";
 import { usePlacesStore } from '~/store/usePlacesStore';
 import { useMapStore } from '~/store/useMapStore';
 import { useAccuracy } from '~/composables/useAccuracy';
+import { useMapConfigStore } from "~/store/useMapConfigStore";
 
 const placesStore = usePlacesStore();
 const mapStore = useMapStore();
+const mapConfigStore = useMapConfigStore();
+const { removeUserPosition } = mapConfigStore;
+
 const { currentLocation, medianAccuracy } = useAccuracy();
 
 const mapElement = ref();
@@ -33,16 +37,26 @@ const customGeolocation = {
     const id = ++this.watchIdCounter;
 
     const invokeSuccess = () => {
-      if (currentLocation.value.lat && currentLocation.value.lng) {
-        const position = {
+      const lastPosition = removeUserPosition();
+      console.log('Consumer lastPosition', lastPosition);
+      if (lastPosition && lastPosition.lat && lastPosition.lng) {
+        // const position = {
+        //   coords: {
+        //     latitude: currentLocation.value.lat,
+        //     longitude: currentLocation.value.lng,
+        //     accuracy: medianAccuracy.value || 1000,
+        //   },
+        //   timestamp: Date.now(),
+        // };
+        console.log('lastPosition mapView', lastPosition);
+        successCallback({
           coords: {
-            latitude: currentLocation.value.lat,
-            longitude: currentLocation.value.lng,
-            accuracy: medianAccuracy.value || 1000,
+            latitude: lastPosition.lat,
+            longitude: lastPosition.lng,
+            accuracy: lastPosition.accuracy,
           },
-          timestamp: Date.now(),
-        };
-        successCallback(position);
+          timestamp: lastPosition.timestamp,
+        });
       }
     };
 

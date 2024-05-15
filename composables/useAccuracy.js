@@ -47,7 +47,7 @@ export const useAccuracy = () => {
   const currentLocation = ref(undefined);
 
   const mapConfigStore = useMapConfigStore();
-  const { setUserSpeed } = mapConfigStore;
+  const { setUserSpeed, addUserPosition } = mapConfigStore;
   const {
     calculateLocationMode,
     kalmanQ,
@@ -150,17 +150,36 @@ export const useAccuracy = () => {
   function calculateLocation() {
     const recentPositions = positions.value;
     const positionCount = recentPositions.length;
-    if (positionCount < 2) return;
+    if (positionCount < 2) return [null, null];
 
     const speed = calculateSpeedFromPositions(recentPositions);
-
+    let location = null;
     setUserSpeed(speed);
     console.log("Calculated speed (km/h):", speed);
 
     if (calculateLocationMode.value === "kalman") {
-      return calculateSmoothedLocationKalman(speed);
+      location = calculateSmoothedLocationKalman(speed);
     } else {
-      return calculateSmoothedLocationSimpleAVG(speed);
+      location = calculateSmoothedLocationSimpleAVG(speed);
+    }
+
+    return [speed, location];
+  }
+
+  function interpolateAndPublish(lastPosition, newPosition, steps) {
+    console.log("Interpolating", lastPosition, newPosition);
+    for (let i = 1; i <= steps; i++) {
+      let fraction = i / steps;
+      let start = lastPosition;
+      let end = newPosition;
+      let lat = start.lat + (end.lat - start.lat) * fraction;
+      let lng = start.lng + (end.lng - start.lng) * fraction;
+      let timestamp =
+        start.timestamp + (end.timestamp - start.timestamp) * fraction;
+      let accuracy =
+        start.accuracy + (end.accuracy - start.accuracy) * fraction;
+      console.log(`Interpolated ${i}:`, { lat, lng, accuracy, timestamp });
+      addUserPosition({ lat, lng, accuracy, timestamp });
     }
   }
 
@@ -181,9 +200,10 @@ export const useAccuracy = () => {
         // if we doesn't have a current location, set it to the new coords
         if (!currentLocation.value) {
           currentLocation.value = newCoords;
+          addUserPosition(newCoords);
         }
 
-        const smoothedLocation = calculateLocation();
+        const [speed, smoothedLocation] = calculateLocation();
         console.log("smoothedLocation", smoothedLocation);
 
         // If smoothed location is the same that current location not update
@@ -197,6 +217,11 @@ export const useAccuracy = () => {
 
         if (smoothedLocation) {
           currentLocation.value = smoothedLocation;
+          // Emit interpolated positions
+          const steps = speed > 0 ? 5 : 1;
+          const lastPosition = positions.value[positions.value.length - 2];
+          const newPosition = positions.value[positions.value.length - 1];
+          interpolateAndPublish(lastPosition, newPosition, steps);
         }
       },
       (err) => {

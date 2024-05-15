@@ -9,6 +9,7 @@ export const useMapConfigStore = defineStore("mapConfig", () => {
   const medianSampleSize = ref(5);
   const positionInterval = ref(1000);
   const userSpeed = ref(0);
+  const userPositions = ref([]);
 
   // Methods
   function setCalculationMode(mode) {
@@ -35,6 +36,19 @@ export const useMapConfigStore = defineStore("mapConfig", () => {
     userSpeed.value = value;
   }
 
+  function setUserPositions(value) {
+    userPositions.value = value;
+  }
+
+  function addUserPosition(value) {
+    userPositions.value.push(value);
+  }
+
+  function removeUserPosition() {
+    const lastPosition = userPositions.value.shift();
+    return lastPosition;
+  }
+
   return {
     calculateLocationMode,
     kalmanQ,
@@ -42,6 +56,7 @@ export const useMapConfigStore = defineStore("mapConfig", () => {
     positionInterval,
     medianSampleSize,
     userSpeed,
+    userPositions,
 
     setCalculationMode,
     setKalmanQ,
@@ -49,5 +64,8 @@ export const useMapConfigStore = defineStore("mapConfig", () => {
     setMedianSampleSize,
     setPositionInterval,
     setUserSpeed,
+    setUserPositions,
+    addUserPosition,
+    removeUserPosition,
   };
 });
