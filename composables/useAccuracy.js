@@ -44,7 +44,6 @@ export const useAccuracy = () => {
   const positions = ref([]);
   const status = ref(STATES.UNKNOWN);
   const medianAccuracy = ref(undefined);
-  const currentLocation = ref(undefined);
   const oldSmoothedLocation = ref(undefined);
 
   const mapConfigStore = useMapConfigStore();
@@ -188,11 +187,11 @@ export const useAccuracy = () => {
   }
 
   function getStepsInterpolation(speed) {
-    if (speed < 0.5) return 1;
-    if (speed < 1) return 1;
-    if (speed < 3) return 2;
-    if (speed < 5) return 3;
-    return 4;
+    if (speed < 0.5) return 2;
+    if (speed < 1) return 3;
+    if (speed < 3) return 5;
+    if (speed < 5) return 7;
+    return 9;
   }
 
   function getPosition() {
@@ -209,38 +208,35 @@ export const useAccuracy = () => {
         updatedPositions.push(newCoords);
         positions.value = updatedPositions;
 
-        // if we doesn't have a current location, set it to the new coords
-        if (!currentLocation.value) {
-          currentLocation.value = newCoords;
+        if (positions.value.length === 1) {
           addUserPosition(newCoords);
+          return;
         }
 
         const [speed, smoothedLocation] = calculateLocation();
         console.log("smoothedLocation", smoothedLocation);
 
-        // If smoothed location is the same that current location not update
+        if (!smoothedLocation) return;
+
+        // If smoothed location is the same that old smoothed location, do not emit
         if (
-          smoothedLocation &&
-          currentLocation.value?.lat === smoothedLocation.lat &&
-          currentLocation.value?.lng === smoothedLocation.lng
+          oldSmoothedLocation.value?.lat === smoothedLocation.lat &&
+          oldSmoothedLocation.value?.lng === smoothedLocation.lng
         ) {
           return;
         }
 
-        if (smoothedLocation) {
-          currentLocation.value = smoothedLocation;
-          // Emit interpolated positions
-          const steps = getStepsInterpolation(speed);
-          if (!oldSmoothedLocation.value) {
-            oldSmoothedLocation.value = smoothedLocation;
-            addUserPosition(smoothedLocation);
-            return;
-          }
-          const lastPosition = oldSmoothedLocation.value;
-          const newPosition = smoothedLocation;
-          interpolateAndPublish(lastPosition, newPosition, steps);
+        // Emit interpolated positions
+        const steps = getStepsInterpolation(speed);
+        if (!oldSmoothedLocation.value) {
           oldSmoothedLocation.value = smoothedLocation;
+          addUserPosition(smoothedLocation);
+          return;
         }
+        const lastPosition = { ...oldSmoothedLocation.value };
+        const newPosition = smoothedLocation;
+        oldSmoothedLocation.value = { ...smoothedLocation };
+        interpolateAndPublish(lastPosition, newPosition, steps);
       },
       (err) => {
         console.error(err);
@@ -290,7 +286,6 @@ export const useAccuracy = () => {
     status,
     medianAccuracy,
     positions,
-    currentLocation,
 
     hasPositions: computed(() => positions.value.length > 0),
   };

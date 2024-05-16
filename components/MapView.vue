@@ -10,7 +10,7 @@
 </template>
 
 <script setup>
-const UPDATE_COORDINATES_INTERVAL = 200;
+const UPDATE_COORDINATES_INTERVAL = 100;
 
 import mapboxgl from "mapbox-gl";
 
@@ -23,8 +23,6 @@ const placesStore = usePlacesStore();
 const mapStore = useMapStore();
 const mapConfigStore = useMapConfigStore();
 const { removeUserPosition } = mapConfigStore;
-
-const { currentLocation, medianAccuracy } = useAccuracy();
 
 const mapElement = ref();
 const lastUsedPosition = ref(null);
@@ -53,14 +51,6 @@ const customGeolocation = {
       }
 
       if (lastPosition && lastPosition.lat && lastPosition.lng) {
-        // const position = {
-        //   coords: {
-        //     latitude: currentLocation.value.lat,
-        //     longitude: currentLocation.value.lng,
-        //     accuracy: medianAccuracy.value || 1000,
-        //   },
-        //   timestamp: Date.now(),
-        // };
         console.log('lastPosition mapView', lastPosition);
         lastUsedPosition.value = lastPosition;
         successCallback({
