@@ -10,7 +10,7 @@
 </template>
 
 <script setup>
-const UPDATE_COORDINATES_INTERVAL = 150;
+const UPDATE_COORDINATES_INTERVAL = 200;
 
 import mapboxgl from "mapbox-gl";
 
@@ -27,6 +27,7 @@ const { removeUserPosition } = mapConfigStore;
 const { currentLocation, medianAccuracy } = useAccuracy();
 
 const mapElement = ref();
+const lastUsedPosition = ref(null);
 
 // Implement our own geolocation to use location of our store.
 const customGeolocation = {
@@ -39,6 +40,18 @@ const customGeolocation = {
     const invokeSuccess = () => {
       const lastPosition = removeUserPosition();
       console.log('Consumer lastPosition', lastPosition);
+      if (!lastPosition && lastUsedPosition.value.lat && lastUsedPosition.value.lng) {
+        successCallback({
+          coords: {
+            latitude: lastUsedPosition.value.lat,
+            longitude: lastUsedPosition.value.lng,
+            accuracy: lastUsedPosition.value.accuracy || 150,
+          },
+          timestamp: lastUsedPosition.value.timestamp || Date.now(),
+        });
+        return;
+      }
+
       if (lastPosition && lastPosition.lat && lastPosition.lng) {
         // const position = {
         //   coords: {
@@ -49,13 +62,14 @@ const customGeolocation = {
         //   timestamp: Date.now(),
         // };
         console.log('lastPosition mapView', lastPosition);
+        lastUsedPosition.value = lastPosition;
         successCallback({
           coords: {
             latitude: lastPosition.lat,
             longitude: lastPosition.lng,
-            accuracy: lastPosition.accuracy,
+            accuracy: lastPosition.accuracy || 150,
           },
-          timestamp: lastPosition.timestamp,
+          timestamp: lastPosition.timestamp || Date.now(),
         });
       }
     };

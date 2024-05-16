@@ -1,6 +1,7 @@
 <template>
   <div class="card-container rounded shadow-lg p-1">
     <div class="font-bold text-md">{{ userSpeed }} KM/H</div>
+    <p class="text-sm">positions: {{ userPositions.length }}</p>
   </div>
 </template>
 
@@ -9,7 +10,7 @@ import { storeToRefs } from 'pinia';
 import { useMapConfigStore } from '../store/useMapConfigStore';
 
 const mapConfigStore = useMapConfigStore();
-const { userSpeed } = storeToRefs(mapConfigStore);
+const { userSpeed, userPositions } = storeToRefs(mapConfigStore);
 
 </script>
 

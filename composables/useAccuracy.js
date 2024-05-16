@@ -123,6 +123,8 @@ export const useAccuracy = () => {
     return {
       lat: smoothedLats[smoothedLats.length - 1],
       lng: smoothedLngs[smoothedLngs.length - 1],
+      accuracy: recentPositions[recentPositions.length - 1].accuracy,
+      timestamp: recentPositions[recentPositions.length - 1].timestamp,
     };
   }
 
@@ -184,6 +186,14 @@ export const useAccuracy = () => {
     }
   }
 
+  function getStepsInterpolation(speed) {
+    if (speed < 0.5) return 1;
+    if (speed < 1) return 2;
+    if (speed < 3) return 3;
+    if (speed < 5) return 4;
+    return 5;
+  }
+
   function getPosition() {
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => {
@@ -220,7 +230,7 @@ export const useAccuracy = () => {
           currentLocation.value = smoothedLocation;
           addUserPosition(smoothedLocation);
           // Emit interpolated positions
-          const steps = speed > 0 ? 5 : 1;
+          const steps = getStepsInterpolation(speed);
           if (userPositions.value.length <= 1) return;
           const lastPosition =
             userPositions.value[userPositions.value.length - 2];
