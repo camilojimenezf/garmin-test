@@ -45,6 +45,7 @@ export const useAccuracy = () => {
   const status = ref(STATES.UNKNOWN);
   const medianAccuracy = ref(undefined);
   const currentLocation = ref(undefined);
+  const oldSmoothedLocation = ref(undefined);
 
   const mapConfigStore = useMapConfigStore();
   const { setUserSpeed, addUserPosition } = mapConfigStore;
@@ -230,12 +231,15 @@ export const useAccuracy = () => {
           currentLocation.value = smoothedLocation;
           // Emit interpolated positions
           const steps = getStepsInterpolation(speed);
-          if (userPositions.value.length <= 1) return;
-          const lastPosition =
-            userPositions.value[userPositions.value.length - 2];
-          const newPosition =
-            userPositions.value[userPositions.value.length - 1];
+          if (!oldSmoothedLocation.value) {
+            oldSmoothedLocation.value = smoothedLocation;
+            addUserPosition(smoothedLocation);
+            return;
+          }
+          const lastPosition = oldSmoothedLocation.value;
+          const newPosition = smoothedLocation;
           interpolateAndPublish(lastPosition, newPosition, steps);
+          oldSmoothedLocation.value = smoothedLocation;
         }
       },
       (err) => {
