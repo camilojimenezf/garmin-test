@@ -188,10 +188,10 @@ export const useAccuracy = () => {
 
   function getStepsInterpolation(speed) {
     if (speed < 0.5) return 1;
-    if (speed < 1) return 2;
-    if (speed < 3) return 3;
-    if (speed < 5) return 4;
-    return 5;
+    if (speed < 1) return 1;
+    if (speed < 3) return 2;
+    if (speed < 5) return 3;
+    return 4;
   }
 
   function getPosition() {
@@ -228,7 +228,6 @@ export const useAccuracy = () => {
 
         if (smoothedLocation) {
           currentLocation.value = smoothedLocation;
-          addUserPosition(smoothedLocation);
           // Emit interpolated positions
           const steps = getStepsInterpolation(speed);
           if (userPositions.value.length <= 1) return;
