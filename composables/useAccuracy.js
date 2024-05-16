@@ -54,6 +54,7 @@ export const useAccuracy = () => {
     kalmanR,
     medianSampleSize,
     positionInterval,
+    userPositions,
   } = storeToRefs(mapConfigStore);
 
   function calculateSpeedFromPositions(positions) {
@@ -217,10 +218,14 @@ export const useAccuracy = () => {
 
         if (smoothedLocation) {
           currentLocation.value = smoothedLocation;
+          addUserPosition(smoothedLocation);
           // Emit interpolated positions
           const steps = speed > 0 ? 5 : 1;
-          const lastPosition = positions.value[positions.value.length - 2];
-          const newPosition = positions.value[positions.value.length - 1];
+          if (userPositions.value.length <= 1) return;
+          const lastPosition =
+            userPositions.value[userPositions.value.length - 2];
+          const newPosition =
+            userPositions.value[userPositions.value.length - 1];
           interpolateAndPublish(lastPosition, newPosition, steps);
         }
       },
