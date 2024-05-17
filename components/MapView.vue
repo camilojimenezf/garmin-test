@@ -13,7 +13,7 @@
 const UPDATE_COORDINATES_INTERVAL = 100;
 
 import mapboxgl from "mapbox-gl";
-
+import { storeToRefs } from "pinia";
 import { usePlacesStore } from '~/store/usePlacesStore';
 import { useMapStore } from '~/store/useMapStore';
 import { useAccuracy } from '~/composables/useAccuracy';
@@ -22,10 +22,10 @@ import { useMapConfigStore } from "~/store/useMapConfigStore";
 const placesStore = usePlacesStore();
 const mapStore = useMapStore();
 const mapConfigStore = useMapConfigStore();
+const { lastUserPosition } = storeToRefs(mapConfigStore);
 const { removeUserPosition } = mapConfigStore;
 
 const mapElement = ref();
-const lastUsedPosition = ref(null);
 
 // Implement our own geolocation to use location of our store.
 const customGeolocation = {
@@ -36,32 +36,30 @@ const customGeolocation = {
     const id = ++this.watchIdCounter;
 
     const invokeSuccess = () => {
+      // move last position to store.
       const lastPosition = removeUserPosition();
       console.log('Consumer lastPosition', lastPosition);
-      if (!lastPosition && lastUsedPosition.value.lat && lastUsedPosition.value.lng) {
+      if (!lastPosition && lastUserPosition.value?.lat && lastUserPosition.value?.lng) {
         successCallback({
           coords: {
-            latitude: lastUsedPosition.value.lat,
-            longitude: lastUsedPosition.value.lng,
-            accuracy: lastUsedPosition.value.accuracy || 150,
+            latitude: lastUserPosition.value.lat,
+            longitude: lastUserPosition.value.lng,
+            accuracy: lastUserPosition.value.accuracy || 150,
           },
-          timestamp: lastUsedPosition.value.timestamp || Date.now(),
+          timestamp: lastUserPosition.value.timestamp || Date.now(),
         });
         return;
       }
 
-      if (lastPosition && lastPosition.lat && lastPosition.lng) {
-        console.log('lastPosition mapView', lastPosition);
-        lastUsedPosition.value = lastPosition;
-        successCallback({
-          coords: {
-            latitude: lastPosition.lat,
-            longitude: lastPosition.lng,
-            accuracy: lastPosition.accuracy || 150,
-          },
-          timestamp: lastPosition.timestamp || Date.now(),
-        });
-      }
+      console.log('lastPosition mapView', lastPosition);
+      successCallback({
+        coords: {
+          latitude: lastPosition.lat,
+          longitude: lastPosition.lng,
+          accuracy: lastPosition.accuracy || 150,
+        },
+        timestamp: lastPosition.timestamp || Date.now(),
+      });
     };
 
     invokeSuccess();

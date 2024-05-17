@@ -10,6 +10,7 @@ export const useMapConfigStore = defineStore("mapConfig", () => {
   const positionInterval = ref(1000);
   const userSpeed = ref(0);
   const userPositions = ref([]);
+  const lastUserPosition = ref(null);
 
   // Methods
   function setCalculationMode(mode) {
@@ -49,6 +50,10 @@ export const useMapConfigStore = defineStore("mapConfig", () => {
     return lastPosition;
   }
 
+  function setLastUserPosition(value) {
+    lastUserPosition.value = value;
+  }
+
   return {
     calculateLocationMode,
     kalmanQ,
@@ -57,6 +62,7 @@ export const useMapConfigStore = defineStore("mapConfig", () => {
     medianSampleSize,
     userSpeed,
     userPositions,
+    lastUserPosition,
 
     setCalculationMode,
     setKalmanQ,
@@ -67,5 +73,6 @@ export const useMapConfigStore = defineStore("mapConfig", () => {
     setUserPositions,
     addUserPosition,
     removeUserPosition,
+    setLastUserPosition,
   };
 });

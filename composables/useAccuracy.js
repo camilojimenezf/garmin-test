@@ -1,4 +1,5 @@
 import KalmanFilter from "kalmanjs";
+import { getCurrentPosition } from "~/services/geolocationService";
 import { useMapConfigStore } from "~/store/useMapConfigStore";
 
 function median(numbers) {
@@ -44,18 +45,11 @@ export const useAccuracy = () => {
   const positions = ref([]);
   const status = ref(STATES.UNKNOWN);
   const medianAccuracy = ref(undefined);
-  const oldSmoothedLocation = ref(undefined);
 
   const mapConfigStore = useMapConfigStore();
-  const { setUserSpeed, addUserPosition } = mapConfigStore;
-  const {
-    calculateLocationMode,
-    kalmanQ,
-    kalmanR,
-    medianSampleSize,
-    positionInterval,
-    userPositions,
-  } = storeToRefs(mapConfigStore);
+  const { setUserSpeed, addUserPosition, setLastUserPosition } = mapConfigStore;
+  const { medianSampleSize, positionInterval, lastUserPosition } =
+    storeToRefs(mapConfigStore);
 
   function calculateSpeedFromPositions(positions) {
     if (positions.length < 2) return 0;
@@ -78,14 +72,6 @@ export const useAccuracy = () => {
     return averageSpeed;
   }
 
-  function calculateUserSpeed(lat1, lon1, lat2, lon2, lastTime) {
-    if (!lastTime) return 0;
-
-    const distance = calculateDistanceKMs(lat1, lon1, lat2, lon2);
-    const time = (new Date().getTime() - lastTime) / 3600000; // Convert ms to hours
-    return distance / time;
-  }
-
   function determineSmoothingFactor(speed) {
     const baseSettings = {
       low: { kalmanR: 0.5, kalmanQ: 0.005, avgFactor: 0.2 },
@@ -102,9 +88,9 @@ export const useAccuracy = () => {
     else return baseSettings.extreme;
   }
 
-  function calculateSmoothedLocationKalman(speed) {
-    const smoothingParams = determineSmoothingFactor(speed);
+  function calculateSmoothedLocationKalman({ positions, smoothingParams }) {
     console.log("Kalman filter smoothingParams", smoothingParams);
+
     const kfLat = new KalmanFilter({
       R: smoothingParams.kalmanR,
       Q: smoothingParams.kalmanQ,
@@ -113,77 +99,42 @@ export const useAccuracy = () => {
       R: smoothingParams.kalmanR,
       Q: smoothingParams.kalmanQ,
     });
-    const recentPositions = positions.value.slice(-medianSampleSize.value);
+    const kfAccuracy = new KalmanFilter({
+      R: smoothingParams.kalmanR,
+      Q: smoothingParams.kalmanQ,
+    });
 
-    if (recentPositions.length < 2) return;
-
-    let smoothedLats = recentPositions.map((pos) => kfLat.filter(pos.lat));
-    let smoothedLngs = recentPositions.map((pos) => kfLng.filter(pos.lng));
+    let smoothedLats = positions.map((pos) => kfLat.filter(pos.lat));
+    let smoothedLngs = positions.map((pos) => kfLng.filter(pos.lng));
+    let smoothedAccuracies = positions.map((pos) =>
+      kfAccuracy.filter(pos.accuracy)
+    );
 
     return {
       lat: smoothedLats[smoothedLats.length - 1],
       lng: smoothedLngs[smoothedLngs.length - 1],
-      accuracy: recentPositions[recentPositions.length - 1].accuracy,
-      timestamp: recentPositions[recentPositions.length - 1].timestamp,
+      accuracy: smoothedAccuracies[smoothedAccuracies.length - 1],
+      timestamp: positions[positions.length - 1].timestamp,
     };
   }
 
-  function calculateSmoothedLocationSimpleAVG(speed) {
+  function calculateSpeedAndLocation(positions) {
+    console.log("positions", positions);
+    if (positions.length < 2) {
+      return {
+        speed: 0,
+        location: positions[0],
+      };
+    }
+    const speed = calculateSpeedFromPositions(positions);
     const smoothingParams = determineSmoothingFactor(speed);
-    console.log("Simple AVG smoothingParams", smoothingParams);
-    const recentPositions = positions.value.slice(-medianSampleSize.value);
-    if (recentPositions.length < medianSampleSize.value) return;
-
-    let sumLat = 0;
-    let sumLng = 0;
-    recentPositions.forEach((pos, index) => {
-      const weight = smoothingParams.avgFactor;
-      sumLat += pos.lat * weight;
-      sumLng += pos.lng * weight;
+    const location = calculateSmoothedLocationKalman({
+      positions,
+      smoothingParams,
     });
-
-    const avgLat =
-      sumLat / (recentPositions.length * smoothingParams.avgFactor);
-    const avgLng =
-      sumLng / (recentPositions.length * smoothingParams.avgFactor);
-
-    return { lat: avgLat, lng: avgLng };
-  }
-
-  function calculateLocation() {
-    const recentPositions = positions.value;
-    const positionCount = recentPositions.length;
-    if (positionCount < 2) return [null, null];
-
-    const speed = calculateSpeedFromPositions(recentPositions);
-    let location = null;
-    setUserSpeed(speed);
     console.log("Calculated speed (km/h):", speed);
 
-    if (calculateLocationMode.value === "kalman") {
-      location = calculateSmoothedLocationKalman(speed);
-    } else {
-      location = calculateSmoothedLocationSimpleAVG(speed);
-    }
-
-    return [speed, location];
-  }
-
-  function interpolateAndPublish(lastPosition, newPosition, steps) {
-    console.log("Interpolating", lastPosition, newPosition);
-    for (let i = 1; i <= steps; i++) {
-      let fraction = i / steps;
-      let start = lastPosition;
-      let end = newPosition;
-      let lat = start.lat + (end.lat - start.lat) * fraction;
-      let lng = start.lng + (end.lng - start.lng) * fraction;
-      let timestamp =
-        start.timestamp + (end.timestamp - start.timestamp) * fraction;
-      let accuracy =
-        start.accuracy + (end.accuracy - start.accuracy) * fraction;
-      console.log(`Interpolated ${i}:`, { lat, lng, accuracy, timestamp });
-      addUserPosition({ lat, lng, accuracy, timestamp });
-    }
+    return { speed, location };
   }
 
   function getStepsInterpolation(speed) {
@@ -194,62 +145,69 @@ export const useAccuracy = () => {
     return 9;
   }
 
-  function getPosition() {
-    navigator.geolocation.getCurrentPosition(
-      ({ coords }) => {
-        const newCoords = {
-          lng: coords.longitude,
-          lat: coords.latitude,
-          accuracy: coords.accuracy,
-          timestamp: new Date().getTime(),
-        };
-        console.log(newCoords);
-        const updatedPositions = positions.value.slice(-medianSampleSize.value);
-        updatedPositions.push(newCoords);
-        positions.value = updatedPositions;
+  function transormPosition(position) {
+    return {
+      lat: position.coords.latitude,
+      lng: position.coords.longitude,
+      accuracy: position.coords.accuracy,
+      timestamp: new Date().getTime(),
+    };
+  }
 
-        if (positions.value.length === 1) {
-          addUserPosition(newCoords);
-          return;
-        }
+  function emitCoordinates({ location, oldLocation, steps }) {
+    if (!oldLocation) {
+      addUserPosition(location);
+      return;
+    }
 
-        const [speed, smoothedLocation] = calculateLocation();
-        console.log("smoothedLocation", smoothedLocation);
+    if (location.lat === oldLocation.lat && location.lng === oldLocation.lng) {
+      return;
+    }
 
-        if (!smoothedLocation) return;
+    interpolateCoordinates({
+      lastPosition: { ...oldLocation },
+      newPosition: location,
+      steps,
+      callbackFn: addUserPosition,
+    });
+  }
 
-        // If smoothed location is the same that old smoothed location, do not emit
-        if (
-          oldSmoothedLocation.value?.lat === smoothedLocation.lat &&
-          oldSmoothedLocation.value?.lng === smoothedLocation.lng
-        ) {
-          return;
-        }
+  async function runTrackingProcess() {
+    const options = {
+      enableHighAccuracy: true,
+      timeout: 5000,
+      maximumAge: 0,
+    };
 
-        // Emit interpolated positions
-        const steps = getStepsInterpolation(speed);
-        if (!oldSmoothedLocation.value) {
-          oldSmoothedLocation.value = smoothedLocation;
-          addUserPosition(smoothedLocation);
-          return;
-        }
-        const lastPosition = { ...oldSmoothedLocation.value };
-        const newPosition = smoothedLocation;
-        oldSmoothedLocation.value = { ...smoothedLocation };
-        interpolateAndPublish(lastPosition, newPosition, steps);
-      },
-      (err) => {
-        console.error(err);
-      },
-      { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-    );
+    try {
+      // 1. Get current position and add it to the positions array
+      const newPosition = await getCurrentPosition(options);
+      const newCoords = transormPosition(newPosition);
+      const updatedPositions = [...positions.value, newCoords];
+      positions.value = updatedPositions.slice(-medianSampleSize.value);
+
+      // 2. Calculate speed, smooth location and interpolate
+      const { speed, location: smoothedLocation } = calculateSpeedAndLocation(
+        positions.value
+      );
+      setUserSpeed(speed);
+      const steps = getStepsInterpolation(speed);
+      emitCoordinates({
+        location: smoothedLocation,
+        oldLocation: lastUserPosition.value,
+        steps,
+      });
+      setLastUserPosition(smoothedLocation);
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   function startTracking() {
-    getPosition();
+    runTrackingProcess();
 
     watchPositionId.value = setInterval(() => {
-      getPosition();
+      runTrackingProcess();
     }, positionInterval.value);
   }
 
