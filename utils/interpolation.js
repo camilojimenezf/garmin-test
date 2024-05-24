@@ -1,7 +1,7 @@
 export function getStepsInterpolation(speed) {
-  if (speed < 0.5) return 2;
-  if (speed < 1) return 3;
-  if (speed < 3) return 5;
+  if (speed < 0.5) return 5;
+  if (speed < 1) return 5;
+  if (speed < 3) return 6;
   if (speed < 5) return 7;
   return 9;
 }
