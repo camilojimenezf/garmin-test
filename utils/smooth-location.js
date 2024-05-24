@@ -2,7 +2,7 @@ import KalmanFilter from "kalmanjs";
 
 export function determineSmoothingFactor(speed) {
   const baseSettings = {
-    low: { kalmanR: 0.5, kalmanQ: 0.005, avgFactor: 0.2 },
+    low: { kalmanR: 0.3, kalmanQ: 0.004, avgFactor: 0.5 },
     normal: { kalmanR: 0.2, kalmanQ: 0.003, avgFactor: 0.5 },
     high: { kalmanR: 0.1, kalmanQ: 0.002, avgFactor: 0.8 },
     superHigh: { kalmanR: 0.05, kalmanQ: 0.001, avgFactor: 1 },
