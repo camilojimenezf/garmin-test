@@ -3,17 +3,13 @@
     <header>
       <ul class="flex flex-row bg-green-500 py-1 px-2">
         <li class="mr-4">
-          <NuxtLink to="/garminconnection" class="text-white hover:text-green-200 font-semibold">Garmin Connection
-          </NuxtLink>
-        </li>
-        <li class="mr-4">
           <NuxtLink to="/mappage" class="text-white hover:text-green-200 font-semibold">Map View</NuxtLink>
         </li>
         <li class="mr-4">
           <NuxtLink to="/accuracypage" class="text-white hover:text-green-200 font-semibold">Accuracy</NuxtLink>
         </li>
         <li class="mr-4">
-          <NuxtLink to="/garmintutorialpage" class="text-white hover:text-green-200 font-semibold">Garmin Tutorial
+          <NuxtLink to="/browsersupport" class="text-white hover:text-green-200 font-semibold">Browser Info
           </NuxtLink>
         </li>
       </ul>
